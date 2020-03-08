@@ -1,0 +1,10 @@
+version: '3.4'
+
+services:
+  p1reader:
+    build:
+      context: .
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    env_file:
+      - config.env
