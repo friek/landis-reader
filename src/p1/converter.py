@@ -1,12 +1,11 @@
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
 from typing import Optional, Tuple
 
+import pendulum
 from dataclasses_json import dataclass_json, config
 from marshmallow import fields
-from pytz import timezone
 
 
 class Tariff(Enum):
@@ -14,16 +13,16 @@ class Tariff(Enum):
     DAY = 2
 
 
-def date_encoder(s):
+def date_encoder(s: pendulum.DateTime):
     if s is None:
         return None
-    return datetime.isoformat(s)
+    return s.to_iso8601_string()
 
 
-def date_decoder(s):
+def date_decoder(s: str):
     if s is None:
         return None
-    return datetime.fromisoformat(s)
+    return pendulum.parse(s)
 
 
 @dataclass_json
@@ -34,7 +33,7 @@ class MeterReading:
     # Version information for P1 output
     output_version: str = ''
     # Date/time of the power meter
-    meter_time: datetime = field(
+    meter_time: pendulum.DateTime = field(
         default=None,
         metadata=config(
             encoder=date_encoder,
@@ -83,7 +82,7 @@ class MeterReading:
     # The serial number of the gas meter
     gas_meter_serial: str = None
     # The date/time of the last gas measurement
-    gas_last_measurement: datetime = field(
+    gas_last_measurement: pendulum.DateTime = field(
         default=None,
         metadata=config(
             encoder=date_encoder,
@@ -98,7 +97,7 @@ class MeterReading:
 class Converter:
     __match_record__ = re.compile(r"^(?P<category>[0-9:\-.]+)\((?P<meta_or_value>[^)]+)\)(\((?P<value>.*)\))?$")
     __date_match__ = re.compile(
-        r"^(?P<year>\d{2})(?P<mon>\d{2})(?P<day>\d{2})(?P<hr>\d{2})(?P<min>\d{2})(?P<sec>\d{2})")
+        r"^(?P<year>\d{2})(?P<mon>\d{2})(?P<day>\d{2})(?P<hr>\d{2})(?P<min>\d{2})(?P<sec>\d{2})(?P<time_type>[WS])")
     __float_match__ = re.compile(r"^(?P<value>\d+\.\d+)")
 
     def convert_p1_message(self, message) -> MeterReading:
@@ -161,9 +160,10 @@ class Converter:
         return 0
 
     @staticmethod
-    def __timestamp__(value) -> Optional[datetime]:
+    def __timestamp__(value) -> Optional[pendulum.DateTime]:
         if (m := Converter.__date_match__.match(value)) is None:
             return None
+
         date_info = {
             'year': int('20' + m.group('year')),
             'month': int(m.group('mon')),
@@ -171,10 +171,12 @@ class Converter:
             'hour': int(m.group('hr')),
             'minute': int(m.group('min')),
             'second': int(m.group('sec')),
-            'tzinfo': timezone("CET"),
+            'tz': 'CET',
         }
 
-        return datetime(**date_info)
+        return pendulum.datetime(**date_info)
+
+        # return datetime(**date_info)
 
     @staticmethod
     def __parse_float__(value) -> float:
@@ -193,7 +195,7 @@ class Converter:
         return None
 
     @classmethod
-    def __get_field_mapping__(cls, field):
+    def __get_field_mapping__(cls, fld):
         field_mappings = {
             '1-3:0.2.8': {'value_parser': cls.__parse_string__, 'value_dest': 'output_version'},
             '0-0:1.0.0': {'value_parser': cls.__timestamp__, 'value_dest': 'meter_time'},
@@ -221,7 +223,7 @@ class Converter:
                            'meta_parser': cls.__timestamp__, 'meta_dest': 'gas_last_measurement'},
         }
 
-        return field_mappings.get(field, None)
+        return field_mappings.get(fld, None)
 
     def __parse_record__(self, reading):
         pass
