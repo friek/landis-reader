@@ -36,7 +36,7 @@ class Reader:
 
                 if line[0] == '!':
                     # End of message
-                    yield self._converter.convert_p1_message(message)
+                    yield self._converter.convert_p1_message(message), message
                     message = ""
             except:
                 self._ser.close()

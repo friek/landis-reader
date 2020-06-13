@@ -23,7 +23,9 @@ if __name__ == '__main__':
 
     p1_reader = Reader(port=os.getenv("P1_PORT"))
     topic = os.getenv("ENERGY_TOPIC")
+    raw_topic = os.getenv("ENERGY_RAW_TOPIC")
 
-    for message in p1_reader.read_forever():
+    for message, raw_message in p1_reader.read_forever():
         c.publish(topic=topic, payload=message.to_json())
+        c.publish(topic=raw_topic, payload=raw_message)
         LOGGER.info("Broadcasted message")
