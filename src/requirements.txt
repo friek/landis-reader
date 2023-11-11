@@ -15,7 +15,7 @@ requests==2.22.0
 stringcase==1.2.0
 typing-extensions==3.7.4.1
 typing-inspect==0.5.0
-urllib3==1.26.5
+urllib3==1.26.18
 certifi==2022.12.7
 chardet==3.0.4
 dataclasses-json==0.3.7
@@ -37,4 +37,4 @@ six==1.14.0
 stringcase==1.2.0
 typing-extensions==3.7.4.1
 typing-inspect==0.5.0
-urllib3==1.26.5
+urllib3==1.26.18
