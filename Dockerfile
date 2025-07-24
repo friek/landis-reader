@@ -1,6 +1,6 @@
 FROM python:3.13
 
-RUN --mount=type=bind,source=sources/requirements.txt,target=/tmp/requirements.txt \
+RUN --mount=type=bind,source=src/requirements.txt,target=/tmp/requirements.txt \
   pip install --requirement /tmp/requirements.txt
 
 COPY src/ /application/
