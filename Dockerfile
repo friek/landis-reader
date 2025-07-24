@@ -1,9 +1,9 @@
-FROM python:3.8
+FROM python:3.13
 
-COPY src/requirements.txt /tmp
-RUN pip install -r /tmp/requirements.txt
+RUN --mount=type=bind,source=src/requirements.txt,target=/tmp/requirements.txt \
+  pip install --requirement /tmp/requirements.txt
 
-ADD src/ /application/
+COPY src/ /application/
 
 ENV MQTT_HOST=localhost
 ENV MQTT_PORT=1883

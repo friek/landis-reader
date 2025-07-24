@@ -70,7 +70,7 @@ class MeterReading:
     # Numeric message (?)
     message_numeric: int = 0
     # Textual message (?)
-    message_text: str = None
+    message_text: Optional[str] = None
     # Instantaneous current L1 in A resolution.
     instantaneous_current_l1: int = 0
     # Instantaneous active power L1 (+P) in W resolution
@@ -80,7 +80,7 @@ class MeterReading:
     # Number of devices on the M-Bus
     num_mbus_devices: int = 0
     # The serial number of the gas meter
-    gas_meter_serial: str = None
+    gas_meter_serial: Optional[str] = None
     # The date/time of the last gas measurement
     gas_last_measurement: pendulum.DateTime = field(
         default=None,
@@ -91,7 +91,7 @@ class MeterReading:
         )
     )
     # Total usage of gas
-    gas_usage_total: float = None
+    gas_usage_total: float = Optional[None]
 
 
 class Converter:
@@ -101,7 +101,7 @@ class Converter:
     __float_match__ = re.compile(r"^(?P<value>\d+\.\d+)")
 
     def convert_p1_message(self, message) -> MeterReading:
-        message_contents = self.__message_to_text__(message).split("\n")
+        message_contents = self.__message_to_text__(message).split("\r\n")
         values = {}
 
         for reading in message_contents:
@@ -175,8 +175,6 @@ class Converter:
         }
 
         return pendulum.datetime(**date_info)
-
-        # return datetime(**date_info)
 
     @staticmethod
     def __parse_float__(value) -> float:
