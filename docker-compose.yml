@@ -1,11 +1,22 @@
-version: '3.4'
-
 services:
   p1reader:
     restart: always
     build:
       context: .
+    volumes:
+      - "/dev/p1serial:/dev/p1serial"
     devices:
       - "/dev/ttyUSB0:/dev/ttyUSB0"
+      - "/dev/ttyUSB1:/dev/ttyUSB1"
     env_file:
       - config.env
+    networks: [ mqtt ]
+    logging:
+       driver: "json-file"
+       options:
+          max-file: "5"
+          max-size: "10m"
+
+networks:
+  mqtt:
+    name: mqtt
