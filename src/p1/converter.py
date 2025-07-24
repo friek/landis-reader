@@ -101,7 +101,7 @@ class Converter:
     __float_match__ = re.compile(r"^(?P<value>\d+\.\d+)")
 
     def convert_p1_message(self, message) -> MeterReading:
-        message_contents = self.__message_to_text__(message).split("\n")
+        message_contents = self.__message_to_text__(message).split("\r\n")
         values = {}
 
         for reading in message_contents:
