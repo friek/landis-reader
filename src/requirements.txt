@@ -1,5 +1,5 @@
 dataclasses-json==0.6.7
-marshmallow==3.26.1
+marshmallow==3.26.2
 mypy_extensions==1.1.0
 packaging==25.0
 paho-mqtt==2.1.0
